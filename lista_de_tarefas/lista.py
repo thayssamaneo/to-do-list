@@ -13,6 +13,7 @@ with lista.app_context():
     db.create_all()
 
 lista.add_url_rule('/', 'index', ListaController.index, methods=['GET', 'POST'])
+lista.add_url_rule('/excluir/<int:id>', view_func=ListaController.excluir, methods=['GET'])
 
 if __name__ == '__main__':
     lista.run(debug=True)

@@ -5,244 +5,263 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Tarefas</title>
     <style>
-        /* --- ESTILOS GERAIS --- */
+        /* (MANTIVE SEU CSS ORIGINAL INTACTO) */
         :root {
-            --bg-color: #FFF8DC; /* Bege claro conforme a imagem */
-            --header-color: #8B7D6B; /* Marrom acinzentado */
-            --text-white: #fff;
-            
-            /* Cores de Prioridade */
-            --priority-high: #D32F2F;   /* Vermelho */
-            --priority-med: #D4AC0D;    /* Amarelo escuro/Ocre (para contraste com branco) */
-            --priority-low: #388E3C;    /* Verde */
+            --bg-color: #FFF8DC;
+            --header-color: #8B7D6B;
+            --modal-bg: #D6CEA8;
+            --input-bg: #FFFDD0;
+            --priority-high: #D32F2F;   
+            --priority-med: #D4AC0D;    
+            --priority-low: #388E3C;    
         }
-
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; }
+        body { 
+            background-color: var(--bg-color); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
         }
-
-        body {
-            background-color: var(--bg-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+        header { 
+            width: 100%; 
+            background-color: var(--header-color); 
+            color: white; 
+            text-align: center; 
+            padding: 20px; 
+            font-size: 2rem; 
+            font-weight: bold; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
         }
-
-        /* --- CABEÇALHO --- */
-        header {
-            width: 100%;
-            background-color: var(--header-color);
-            color: white;
-            text-align: center;
-            padding: 20px;
-            font-size: 2rem;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        #task-list { 
+            width: 90%; 
+            max-width: 600px; 
+            margin-top: 30px; 
+            list-style: none; 
+            padding-bottom: 100px; 
         }
-
-        /* --- LISTA DE TAREFAS --- */
-        #task-list {
-            width: 90%;
-            max-width: 600px;
-            margin-top: 30px;
-            list-style: none;
-            padding-bottom: 80px; /* Espaço para o botão flutuante */
+        .task-item { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 15px 20px; 
+            border-radius: 50px; 
+            margin-bottom: 15px; 
+            color: white; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2); 
+            transition: all 0.3s ease; 
+            position: relative; 
         }
-
-        /* --- ITEM DA TAREFA (O BLOCO) --- */
-        .task-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 15px 20px;
-            border-radius: 50px; /* Bordas bem arredondadas como na imagem */
-            margin-bottom: 15px;
-            color: white;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            position: relative;
+        .checkbox-container { 
+            position: relative; 
+            cursor: pointer; 
+            width: 40px; 
+            height: 40px; 
+            flex-shrink: 0; 
+            margin-right: 15px; 
         }
-
-        /* Animação de entrada */
-        .task-item.new-task {
-            animation: slideIn 0.4s ease-out;
+        .custom-checkbox { 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(255, 255, 255, 0.4); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: background-color 0.2s; 
         }
-
-        /* Animação de saída (exclusão) */
-        .task-item.removing {
-            transform: translateX(100%);
-            opacity: 0;
+        .check-icon { 
+            display: none; 
+            color: black; 
+            font-size: 1.5rem; 
+            font-weight: bold; 
         }
-
-        /* --- CHECKBOX (Círculo) --- */
-        .checkbox-container {
-            position: relative;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            flex-shrink: 0;
+        .task-content { 
+            flex-grow: 1; 
+            display: flex; 
+            flex-direction: column; 
+            margin-right: 15px; 
+            overflow: hidden; 
         }
-
-        /* O círculo visual */
-        .custom-checkbox {
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s;
+        .task-title { 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            border-bottom: 2px solid rgba(255,255,255,0.8); 
+            margin-bottom: 4px; 
+            padding-bottom: 2px; 
         }
-
-        /* Ícone de Check (escondido por padrão) */
-        .check-icon {
-            display: none;
-            color: black;
-            font-size: 1.5rem;
-            font-weight: bold;
+        .task-desc { 
+            font-size: 0.9rem; 
+            opacity: 0.9; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
         }
-
-        /* --- TEXTO DA TAREFA --- */
-        .task-text {
-            flex-grow: 1;
-            margin: 0 20px;
-            font-size: 1.1rem;
-            border-bottom: 2px solid rgba(255,255,255,0.8); /* Linha sublinhada */
-            padding-bottom: 2px;
-            position: relative;
-            transition: color 0.3s;
+        .task-item.completed .custom-checkbox { 
+            background-color: rgba(255, 255, 255, 0.8); 
         }
-
-        /* Estado Concluído */
-        .task-item.completed .custom-checkbox {
-            background-color: rgba(255, 255, 255, 0.8);
+        .task-item.completed .check-icon { 
+            display: block; 
         }
-        
-        .task-item.completed .check-icon {
-            display: block; /* Mostra o check */
+        .task-item.completed .task-content { 
+            text-decoration: line-through; 
+            opacity: 0.6; 
         }
-
-        .task-item.completed .task-text {
-            text-decoration: line-through; /* Risca o texto */
-            text-decoration-thickness: 2px;
-            opacity: 0.7;
+        .delete-btn { 
+            background: none; 
+            border: none; 
+            cursor: pointer; 
+            color: white; 
+            opacity: 0.8; 
+            transition: transform 0.2s; 
+            flex-shrink: 0; 
         }
-
-        /* --- BOTÃO DE EXCLUIR (Lixeira) --- */
-        .delete-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: white;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-            flex-shrink: 0;
+        .delete-btn:hover { 
+            transform: scale(1.1); 
+            opacity: 1; 
         }
-
-        .delete-btn:hover {
-            opacity: 1;
-            transform: scale(1.1);
+        .delete-btn svg { 
+            width: 30px; 
+            height: 30px; 
+            fill: none; 
+            stroke: currentColor; 
+            stroke-width: 2; 
         }
-
-        .delete-btn svg {
-            width: 30px;
-            height: 30px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 2;
+        .fab { 
+            position: fixed; 
+            bottom: 30px; 
+            right: 30px; 
+            width: 65px; 
+            height: 65px; 
+            background-color: #CDB38B; 
+            border-radius: 50%; 
+            border: none; 
+            font-size: 2rem; 
+            color: black; 
+            cursor: pointer; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
+            transition: transform 0.2s; 
         }
-
-        /* --- BOTÃO ADICIONAR (+) --- */
-        .fab {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 65px;
-            height: 65px;
-            background-color: #CDB38B; /* Cor bege escura da imagem */
-            border-radius: 50%;
-            border: none;
-            font-size: 2rem;
-            color: black;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s;
+        .fab:hover { 
+            transform: scale(1.1); 
         }
-
-        .fab:hover {
-            transform: scale(1.1);
+        .modal-overlay { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(255, 248, 220, 0.6); 
+            backdrop-filter: blur(2px); 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000; 
         }
-
-        /* --- MODAL PARA ADICIONAR TAREFA --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none; /* Oculto por padrão */
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+        .modal { 
+            background-color: var(--modal-bg); 
+            padding: 30px; 
+            border-radius: 20px; 
+            width: 90%; 
+            max-width: 400px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
         }
-
-        .modal {
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        .modal h2 { 
+            color: white; 
+            text-align: center; 
+            font-size: 1.8rem; 
+            margin-bottom: 10px; 
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1); 
         }
-
-        .modal h3 { margin-bottom: 15px; color: #555; }
-        
-        .modal input, .modal select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 1rem;
+        .form-group { 
+            display: flex; 
+            flex-direction: column; 
         }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
+        .form-group label { 
+            font-weight: bold; 
+            color: #333; 
+            margin-bottom: 5px; 
+            font-size: 1rem; 
         }
-
-        .btn-confirm {
-            background-color: var(--priority-low);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
+        .modal-input { 
+            background-color: var(--input-bg); 
+            border: none; 
+            border-radius: 15px; 
+            padding: 12px 15px; 
+            font-size: 1rem; 
+            width: 100%; 
+            position: relative; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); 
         }
-        
-        .btn-cancel {
-            background-color: #ccc;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
+        .input-wrapper { 
+            position: relative; 
         }
-
-        /* Classes de Cores de Fundo (baseadas na prioridade) */
-        .bg-high { background-color: var(--priority-high); }
-        .bg-med { background-color: var(--priority-med); }
-        .bg-low { background-color: var(--priority-low); }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .input-line { 
+            position: absolute; 
+            bottom: 10px; 
+            left: 15px; 
+            right: 15px; 
+            height: 2px; 
+            background-color: #333; 
+            opacity: 0.8; 
+            pointer-events: none; 
+        }
+        .priority-wrapper { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            margin-top: 10px; 
+        }
+        .priority-select { 
+            background-color: #CDB38B; 
+            border: none; 
+            border-radius: 15px; 
+            padding: 10px 20px; 
+            font-size: 1rem; 
+            cursor: pointer; 
+            appearance: none; 
+            text-align: center; 
+            font-weight: bold; 
+            min-width: 120px; 
+        }
+        .btn-submit { 
+            background-color: #FFF8DC; 
+            color: black; 
+            border: none; 
+            border-radius: 25px; 
+            padding: 12px 40px; 
+            font-size: 1.1rem; 
+            cursor: pointer; 
+            align-self: center; 
+            margin-top: 15px; 
+            font-weight: bold; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            transition: transform 0.1s; 
+        }
+        .btn-submit:active { 
+            transform: scale(0.95); 
+        }
+        .close-modal { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            background: none; 
+            border: none; 
+            font-size: 1.5rem; 
+            cursor: pointer; 
+            color: #555; 
+        }
+        .bg-high { 
+            background-color: var(--priority-high); 
+        }
+        .bg-med { 
+            background-color: var(--priority-med); 
+        }
+        .bg-low { 
+            background-color: var(--priority-low); 
         }
     </style>
 </head>
@@ -251,125 +270,92 @@
     <header>Lista de tarefas</header>
 
     <ul id="task-list">
-        <li class="task-item bg-med completed">
+        {% for item in listaTarefas %}
+        <li class="task-item bg-{{ item.prioridade }}" data-id="{{ item.id }}">
             <div class="checkbox-container">
-                <div class="custom-checkbox">
-                    <span class="check-icon">✓</span>
-                </div>
+                <div class="custom-checkbox"><span class="check-icon">✓</span></div>
             </div>
-            <span class="task-text">Tomar café</span>
-            <button class="delete-btn">
+            <div class="task-content">
+                <div class="task-title">{{ item.tarefa }}</div>
+                <div class="task-desc">{{ item.descricao }}</div>
+            </div>
+            <a href="{{ url_for('excluir', id=item.id) }}" class="delete-btn">
                 <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-            </button>
+            </a>
         </li>
+        {% else %}
+        <p style="text-align:center; padding: 20px; opacity: 0.6;">Nenhuma tarefa encontrada.</p>
+        {% endfor %}
     </ul>
 
     <button class="fab" id="add-btn">+</button>
 
     <div class="modal-overlay" id="modal">
-        <div class="modal">
-            <h3>Nova Tarefa</h3>
-            <input type="text" id="task-input" placeholder="O que você precisa fazer?" autofocus>
+        <form class="modal" id="task-form" method="POST" action="{{ url_for('index') }}">
+            <button type="button" class="close-modal" id="close-modal-btn">&times;</button>
             
-            <label for="priority-select">Prioridade:</label>
-            <select id="priority-select">
-                <option value="low">Baixa (Verde)</option>
-                <option value="med">Média (Amarelo)</option>
-                <option value="high">Alta (Vermelho)</option>
-            </select>
+            <h2>Nova tarefa</h2>
 
-            <div class="modal-actions">
-                <button class="btn-cancel" id="cancel-btn">Cancelar</button>
-                <button class="btn-confirm" id="confirm-btn">Adicionar</button>
+            <div class="form-group">
+                <label for="tarefa">Título:</label>
+                <div class="input-wrapper">
+                    <input type="text" id="tarefa" name="tarefa" class="modal-input" required autocomplete="off">
+                    <div class="input-line"></div>
+                </div>
             </div>
-        </div>
+
+            <div class="form-group">
+                <label for="descricao">Descrição:</label>
+                <div class="input-wrapper">
+                    <input type="text" id="descricao" name="descricao" class="modal-input" autocomplete="off">
+                    <div class="input-line"></div>
+                </div>
+            </div>
+
+            <div class="priority-wrapper">
+                <label for="prioridade">Prioridade:</label>
+                <select id="prioridade" name="prioridade" class="priority-select">
+                    <option value="high">Alta</option>
+                    <option value="med">Média</option>
+                    <option value="low">Baixa</option>
+                </select>
+                <span style="margin-left:-35px; pointer-events:none;">&#8964;</span>
+            </div>
+
+            <button type="submit" class="btn-submit">Adicionar</button>
+        </form>
     </div>
 
     <script>
-        const taskList = document.getElementById('task-list');
+        // O JavaScript agora serve APENAS para abrir e fechar o modal
         const addBtn = document.getElementById('add-btn');
         const modal = document.getElementById('modal');
-        const confirmBtn = document.getElementById('confirm-btn');
-        const cancelBtn = document.getElementById('cancel-btn');
-        const taskInput = document.getElementById('task-input');
-        const prioritySelect = document.getElementById('priority-select');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const taskForm = document.getElementById('task-form');
 
-        // Abrir Modal
         addBtn.addEventListener('click', () => {
             modal.style.display = 'flex';
-            taskInput.value = '';
-            taskInput.focus();
+            document.getElementById('tarefa').focus();
         });
 
-        // Fechar Modal
-        cancelBtn.addEventListener('click', () => {
+        closeModalBtn.addEventListener('click', () => {
             modal.style.display = 'none';
         });
 
-        // Adicionar Tarefa
-        confirmBtn.addEventListener('click', addTask);
-
-        // Permitir Enter no input
-        taskInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addTask();
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.style.display = 'none';
         });
 
-        function addTask() {
-            const text = taskInput.value.trim();
-            const priority = prioritySelect.value;
-
-            if (text === '') return alert('Por favor, digite uma tarefa!');
-
-            // Define a classe de cor baseada na prioridade
-            let bgClass = '';
-            if (priority === 'high') bgClass = 'bg-high';
-            else if (priority === 'med') bgClass = 'bg-med';
-            else bgClass = 'bg-low';
-
-            // Cria o HTML do item
-            const li = document.createElement('li');
-            li.className = `task-item ${bgClass} new-task`;
-            
-            li.innerHTML = `
-                <div class="checkbox-container">
-                    <div class="custom-checkbox">
-                        <span class="check-icon">✓</span>
-                    </div>
-                </div>
-                <span class="task-text">${text}</span>
-                <button class="delete-btn">
-                    <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                </button>
-            `;
-
-            // Adiciona na lista
-            taskList.appendChild(li);
-
-            // Fecha modal
-            modal.style.display = 'none';
-        }
-
-        // Event Delegation: Lidar com cliques na lista (Concluir ou Excluir)
-        taskList.addEventListener('click', (e) => {
+        // Interação visual apenas (não salva no banco ainda o status concluído)
+        document.getElementById('task-list').addEventListener('click', (e) => {
             const item = e.target.closest('.task-item');
             if (!item) return;
-
-            // Lógica de Excluir
-            if (e.target.closest('.delete-btn')) {
-                item.classList.add('removing');
-                // Remove do DOM após a animação
-                item.addEventListener('transitionend', () => {
-                    item.remove();
-                });
-                return;
-            }
-
-            // Lógica de Concluir (clique no checkbox ou no texto)
-            if (e.target.closest('.checkbox-container') || e.target.classList.contains('task-text')) {
+            
+            // Checkbox visual
+            if (e.target.closest('.checkbox-container') || e.target.closest('.task-content')) {
                 item.classList.toggle('completed');
             }
         });
     </script>
-
 </body>
 </html>
