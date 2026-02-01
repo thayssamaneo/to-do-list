@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Tarefas</title>
     <style>
-        /* (MANTIVE SEU CSS ORIGINAL INTACTO) */
         :root {
             --bg-color: #FFF8DC;
             --header-color: #8B7D6B;
@@ -146,7 +145,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Impede que o botão suma em telas muito curtas */
             bottom: 20px;
             right: 20px;
             z-index: 999;
@@ -286,9 +284,9 @@
             color: white;
             padding: 15px 25px;
             display: flex;
-            justify-content: space-between; /* Título de um lado, botões do outro */
+            justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap; /* Se não couber, os botões descem */
+            flex-wrap: wrap;
             gap: 15px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: background-color 0.4s ease;
@@ -306,18 +304,14 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-
-        /* Feedback visual de qual tema está ativo */
         .theme-btn.active {
             transform: scale(1.2);
             border-color: white;
             box-shadow: 0 0 8px rgba(255,255,255,0.8);
         }
-
-        /* Ajuste para telas muito pequenas */
         @media (max-width: 400px) {
             header {
-                justify-content: center; /* Centraliza tudo no mobile */
+                justify-content: center;
                 text-align: center;
             }
         }
@@ -392,7 +386,6 @@
     </div>
 
     <script>
-        // O JavaScript agora serve APENAS para abrir e fechar o modal
         const addBtn = document.getElementById('add-btn');
         const modal = document.getElementById('modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
@@ -411,40 +404,30 @@
             if (e.target === modal) modal.style.display = 'none';
         });
 
-        // Interação visual apenas (não salva no banco ainda o status concluído)
         document.getElementById('task-list').addEventListener('click', (e) => {
             const item = e.target.closest('.task-item');
             if (!item) return;
             
-            // Checkbox visual
             if (e.target.closest('.checkbox-container') || e.target.closest('.task-content')) {
                 item.classList.toggle('completed');
             }
         });
 
         function changeTheme(color, element) {
-            // 1. Muda a cor
             document.documentElement.style.setProperty('--header-color', color);
             
-            // 2. Remove a classe 'active' de todos os botões
             document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
             
-            // 3. Adiciona 'active' no botão clicado
             if (element) element.classList.add('active');
-            
-            // 4. Salva a escolha
             localStorage.setItem('selectedTheme', color);
         }
 
-        // Ao carregar, marcar o botão correto como ativo
         window.addEventListener('load', () => {
             const savedColor = localStorage.getItem('selectedTheme') || '#8B7D6B';
             document.documentElement.style.setProperty('--header-color', savedColor);
-            
-            // Procura o botão que tem essa cor e marca como ativo
+        
             const buttons = document.querySelectorAll('.theme-btn');
             buttons.forEach(btn => {
-                // Converte a cor para comparar (alguns navegadores convertem hex para rgb)
                 if (btn.style.backgroundColor.includes(savedColor) || 
                     btn.getAttribute('data-color') === savedColor) {
                     btn.classList.add('active');
