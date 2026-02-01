@@ -141,6 +141,23 @@
             cursor: pointer; 
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); 
             transition: transform 0.2s; 
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Impede que o botão suma em telas muito curtas */
+            bottom: 20px;
+            right: 20px;
+            z-index: 999;
+        }
+        @media (max-width: 600px) {
+            .fab {
+                width: 55px;
+                height: 55px;
+                bottom: 15px;
+                right: 15px;
+            }
         }
         .fab:hover { 
             transform: scale(1.1); 
@@ -263,11 +280,59 @@
         .bg-low { 
             background-color: var(--priority-low); 
         }
+        header {
+            width: 100%;
+            background-color: var(--header-color);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between; /* Título de um lado, botões do outro */
+            align-items: center;
+            flex-wrap: wrap; /* Se não couber, os botões descem */
+            gap: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.4s ease;
+        }
+        .theme-switcher {
+            display: flex;
+            gap: 12px;
+        }
+
+        .theme-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.8);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        /* Feedback visual de qual tema está ativo */
+        .theme-btn.active {
+            transform: scale(1.2);
+            border-color: white;
+            box-shadow: 0 0 8px rgba(255,255,255,0.8);
+        }
+
+        /* Ajuste para telas muito pequenas */
+        @media (max-width: 400px) {
+            header {
+                justify-content: center; /* Centraliza tudo no mobile */
+                text-align: center;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <header>Lista de tarefas</header>
+    <header>
+        <span style="font-size: 1.5rem;">Lista de tarefas</span>
+        <div class="theme-switcher">
+            <button class="theme-btn" data-color="#8B7D6B" style="background-color: #8B7D6B;" onclick="changeTheme('#8B7D6B', this)"></button>
+            <button class="theme-btn" data-color="#4A6972" style="background-color: #4A6972;" onclick="changeTheme('#4A6972', this)"></button>
+            <button class="theme-btn" data-color="#6B8E23" style="background-color: #6B8E23;" onclick="changeTheme('#6B8E23', this)"></button>
+        </div>
+    </header>
 
     <ul id="task-list">
         {% for item in listaTarefas %}
@@ -355,6 +420,36 @@
             if (e.target.closest('.checkbox-container') || e.target.closest('.task-content')) {
                 item.classList.toggle('completed');
             }
+        });
+
+        function changeTheme(color, element) {
+            // 1. Muda a cor
+            document.documentElement.style.setProperty('--header-color', color);
+            
+            // 2. Remove a classe 'active' de todos os botões
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // 3. Adiciona 'active' no botão clicado
+            if (element) element.classList.add('active');
+            
+            // 4. Salva a escolha
+            localStorage.setItem('selectedTheme', color);
+        }
+
+        // Ao carregar, marcar o botão correto como ativo
+        window.addEventListener('load', () => {
+            const savedColor = localStorage.getItem('selectedTheme') || '#8B7D6B';
+            document.documentElement.style.setProperty('--header-color', savedColor);
+            
+            // Procura o botão que tem essa cor e marca como ativo
+            const buttons = document.querySelectorAll('.theme-btn');
+            buttons.forEach(btn => {
+                // Converte a cor para comparar (alguns navegadores convertem hex para rgb)
+                if (btn.style.backgroundColor.includes(savedColor) || 
+                    btn.getAttribute('data-color') === savedColor) {
+                    btn.classList.add('active');
+                }
+            });
         });
     </script>
 </body>
